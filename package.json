@@ -1,0 +1,12 @@
+{
+  "name": "breast_cancer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@tensorflow/tfjs": "^2.7.0",
+    "@tensorflow/tfjs-node-gpu": "^2.7.0",
+    "csv-parse": "^4.14.1",
+    "lodash": "^4.17.20"
+  }
+}
