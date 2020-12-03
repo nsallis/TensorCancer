@@ -29,7 +29,7 @@ const model = tf.sequential();
 model.add(tf.layers.dense({units: 5, activation: 'relu', inputShape: [10]}));
 model.add(tf.layers.dense({units: 150, activation: 'relu'}));
 model.add(tf.layers.dense({units: 250, activation: 'relu'}));
-// model.add(tf.layers.dense({units: 250, activation: 'relu'}));
+model.add(tf.layers.dense({units: 250, activation: 'relu'}));
 model.add(tf.layers.dense({units: 250, activation: 'relu'}));
 model.add(tf.layers.dense({units: 2, activation: 'softmax', outputShape: [2]}));
 // Define the optimizer
@@ -37,20 +37,19 @@ const optimizer = tf.train.adam(LEARNING_RATE);
 // Init the model
 model.compile({
     optimizer: 'sgd',//optimizer,
-    loss: 'meanSquaredError',//'binaryCrossentropy',
+    loss: 'binaryCrossentropy',
     metrics: ['accuracy'],
 });
 
   const ys = transformedData.map(d => d.ys);
   const xs = transformedData.map(d => d.xs);
 
-  let xTrain = tf.tensor2d(xs.slice(0,500), [xs.slice(0,500).length, 10]).toInt();
-  let yTrain = tf.oneHot(tf.tensor1d(ys.slice(0,500)).toInt(), 2); // why int? // [yes, no] (yes malignant, no benign)
-  debugger;
+  let xTrain = tf.tensor2d(xs.slice(0,500), [xs.slice(0,500).length, 10]);
+  let yTrain = tf.oneHot(tf.tensor1d(ys.slice(0,500)).toInt(), 2); // [yes, no] (yes malignant, no benign)
 
   console.log('ready to start training model');
   // await model.fit(xsTensor, tf.cast(ysTensor, 'int32'), {epochs: 1, batchSize: 100});
-  const history = await model.fit(xTrain, yTrain, { // for some reason it thinks this should just always train to one value
+  const history = await model.fit(xTrain, yTrain, {
     epochs: EPOCHS,
     validationSplit: 0.3,
     shuffle: true
@@ -68,8 +67,7 @@ model.compile({
     // const testVal = [0.206,	0.293,	0.140,	0.126,	0.117,	0.277,	0.3514,	0.152,	0.2397,	0.07016]
     console.log(`Testing row: ${JSON.stringify(testXs)} which should result in ${testYs ? 'Malignant' : 'Benign'} (${testYs})`);
 
-    let result = model.predict(tf.tensor(testXs, [1, testXs.length]))//.arraySync();
-    debugger;
+    let result = model.predict(tf.tensor(testXs, [1, testXs.length])).arraySync();
     if (result[0][0] >= 0.5) {
       mals++;
     } else {
